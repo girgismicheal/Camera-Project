@@ -10,8 +10,6 @@
 
 using namespace std;
 
-
-// Create groups of Lidar points whose projection into the camera falls into the same bounding box
 void clusterLidarWithROI(std::vector<BoundingBox> &boundingBoxes, std::vector<LidarPoint> &lidarPoints, float shrinkFactor, cv::Mat &P_rect_xx, cv::Mat &R_rect_xx, cv::Mat &RT)
 {
     // loop over all Lidar points and associate them to a 2D bounding box
@@ -26,8 +24,7 @@ void clusterLidarWithROI(std::vector<BoundingBox> &boundingBoxes, std::vector<Li
         X.at<double>(2, 0) = it1->z;
         X.at<double>(3, 0) = 1;
 
-        // project Lidar point into camera
-        Y = P_rect_xx * R_rect_xx * RT * X;
+	Y = P_rect_xx * R_rect_xx * RT * X;
         cv::Point pt;
         // pixel coordinates
         pt.x = Y.at<double>(0, 0) / Y.at<double>(2, 0);
@@ -42,23 +39,21 @@ void clusterLidarWithROI(std::vector<BoundingBox> &boundingBoxes, std::vector<Li
             smallerBox.y = (*it2).roi.y + shrinkFactor * (*it2).roi.height / 2.0;
             smallerBox.width = (*it2).roi.width * (1 - shrinkFactor);
             smallerBox.height = (*it2).roi.height * (1 - shrinkFactor);
-
-            // check wether point is within current bounding box
             if (smallerBox.contains(pt))
             {
                 enclosingBoxes.push_back(it2);
             }
 
-        } // eof loop over all bounding boxes
+        } 
 
-        // check wether point has been enclosed by one or by multiple boxes
+        
         if (enclosingBoxes.size() == 1)
         {
-            // add Lidar point to bounding box
+           
             enclosingBoxes[0]->lidarPoints.push_back(*it1);
         }
 
-    } // eof loop over all Lidar points
+    } 
 }
 
 /*
@@ -89,11 +84,9 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
             ywmin = ywmin<yw ? ywmin : yw;
             ywmax = ywmax>yw ? ywmax : yw;
 
-            // top-view coordinates
             int y = (-xw * imageSize.height / worldSize.height) + imageSize.height;
             int x = (-yw * imageSize.width / worldSize.width) + imageSize.width / 2;
 
-            // find enclosing rectangle
             top = top<y ? top : y;
             left = left<x ? left : x;
             bottom = bottom>y ? bottom : y;
@@ -126,19 +119,17 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
 
     if(bWait)
     {
-        cv::waitKey(0); // wait for key to be pressed
+        cv::waitKey(0);
     }
 }
 
 
-// associate a given bounding box with the keypoints it contains
 void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr, std::vector<cv::DMatch> &kptMatches)
 { 
   	
     std::vector<cv::DMatch> matches_selected;
     std::vector<double> matches_distance;
 
-  	// check the keypoints are within the bounding boxes
     for (int i = 0; i < kptMatches.size(); ++i)
     {
       	auto distance=cv::norm(kptsCurr[kptMatches[i].trainIdx].pt - kptsPrev[kptMatches[i].queryIdx].pt);
@@ -170,7 +161,6 @@ void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint
 }
 
 
-// Compute time-to-collision (TTC) based on keypoint correspondences in successive images
 void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr,
                       std::vector<cv::DMatch> kptMatches, double frameRate, double &TTC, cv::Mat *visImg)
 {
