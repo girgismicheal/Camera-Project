@@ -220,12 +220,22 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
 ![Image](Image/Picture4.png)
 from the above graph we noticed that the Lidar estimation deviated from the Camera at 3rd, 4th, and 5th images.
 
+### Inaccurate Lidar Estimated Examples
+
 | Image 3                                     | Image 4                                     | Image 5                                     |
 |---------------------------------------------|---------------------------------------------|---------------------------------------------|
 | ![Image](Image/SHITOMASI-FREAK-img0003.png) | ![Image](Image/SHITOMASI-FREAK-img0004.png) | ![Image](Image/SHITOMASI-FREAK-img0005.png) |
-The following examples show the difference between the camera and lidar readings, which shows a failure in the lidar estimation, which maybe due to the b
 
+The following examples show the difference between the camera and lidar readings, which shows a failure in the lidar estimation, so we would generate the Lidar Top View Perspective to inspect the failure's reason.
 
+### Comparing Lidar Top View Examples
+
+|                             | Image                                       | Lidar Top View Perspective       |
+|-----------------------------|---------------------------------------------|----------------------------------|
+| Bad Lidar Estimation Image  | ![Image](Image/SHITOMASI-FREAK-img0004.png) | ![Image](Image/Screenshot_2.png) |
+| Good Lidar Estimation Image | ![Image](Image/SHITOMASI-FREAK-img0007.png) | ![Image](Image/Screenshot_4.png) |
+
+From the above table we show 2 examples, the bad estimated one shows the lidar points more spread out than the good estimated one, which make sense as i calculate the median to estimate the TTC so the median would be farther and that lead to an over-estimated TTC.
 
 ## FP.6 : Performance Evaluation 2
 ### Camera
@@ -249,4 +259,3 @@ From the above table we can conclude that:
 
 from the above table we found the SHITOMASI are the most stable detector in comparison with AKAZE and SIFT. 
 Also, by comparing the SHITOMASI with different descriptors, I found the FREAK is the most stable one.
-
